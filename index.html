@@ -87,7 +87,7 @@
     <section class="view card red" data-card="3"><div class="kicker">4 VON 6 · JETZT PRÜFEN</div><h2>ERINNERUNG ODER MAHNUNG</h2><p class="lead">Eine Stelle erinnert dich an eine offene Antwort, Zahlung oder Unterlage.</p><div class="box"><b>PRÜFE</b>Schon erledigt? Stimmen Betrag, Frist und Bezug? Wenn etwas nicht stimmt: vor Ablauf der Frist klären.</div></section>
     <section class="view card" data-card="4"><div class="kicker">5 VON 6 · ENTSCHEID</div><h2>VERFÜGUNG ODER ENTSCHEID</h2><p class="lead">Eine Behörde teilt dir verbindlich mit, was sie in deinem Fall entschieden hat.</p><div class="box"><b>PRÜFE</b>Was entschieden wurde, welche Folgen das hat und bis wann du reagieren musst.</div></section>
     <section class="view card" data-card="5"><div class="kicker">6 VON 6 · SELBST AKTIV WERDEN</div><h2>ÄNDERUNG MELDEN</h2><p class="lead">Bei wichtigen Veränderungen musst du selbst aktiv werden – zum Beispiel bei einem Umzug.</p><div class="box"><b>PRÜFE</b>Welche Stelle informiert werden muss, bis wann und mit welchem Nachweis.</div></section>
-    <section id="tools" class="view card"><div class="kicker">MUSTERBRIEFE &amp; HILFE</div><h2>WAS BRAUCHST DU?</h2><p class="lead">Wähle den passenden Anlass. Die Formulierungen sind Ausgangspunkte und müssen an deinen Fall angepasst werden.</p><div class="tool-grid" id="toolGrid"></div><div class="privacy"><b>DOKUMENTENCHECKER / FORMULAR-LOTSE</b><br>Der spätere Lotse arbeitet mit dem offiziellen Dokumentnamen, einer allgemeinen Formularnummer oder einem Behördenlink. Keine persönlichen Aktenzeichen, Kundennummern oder ausgefüllten Dokumente eingeben. Bis zur Veröffentlichung bleibt dieser Verweis ausdrücklich als «in Vorbereitung» gekennzeichnet.</div></section>
+    <section id="tools" class="view card"><div class="kicker">MUSTERBRIEFE &amp; HILFE</div><h2>WAS BRAUCHST DU?</h2><p class="lead">Wähle den passenden Anlass. Die Formulierungen sind Ausgangspunkte und müssen an deinen Fall angepasst werden.</p><div class="tool-grid" id="toolGrid"></div><div class="privacy"><b>FORMULAR-LOTSE · IN VORBEREITUNG</b><br>Der spätere Lotse arbeitet mit dem offiziellen Dokumentnamen, einer allgemeinen Formularnummer oder einem Behördenlink. Keine persönlichen Aktenzeichen, Kundennummern oder ausgefüllten Dokumente eingeben. Bis zur Veröffentlichung bleibt dieser Verweis ausdrücklich als «in Vorbereitung» gekennzeichnet.</div></section>
   </main>
   <nav class="controls" aria-label="Navigation"><button class="control secondary" id="map">ZUR MAPPE</button><button class="control" id="back">← ZURÜCK</button><button class="control" id="next">WEITER →</button><span class="count" id="count">ÜBERSICHT</span></nav>
   <script>
@@ -117,6 +117,9 @@
         text: `Betreff: Meldung einer Änderung – [Art der Änderung]\n\nGuten Tag\n\nHiermit melde ich folgende Änderung ab [Datum]:\n\nBisher: [alte Angabe]\nNeu: [neue Angabe]\n\nDen verlangten Nachweis lege ich bei. Bitte bestätigen Sie mir die Anpassung.\n\nFreundliche Grüsse\n[Vorname Nachname]\n[Geschäftsnummer, falls vorhanden]`
       }
     ];
+
+    const templateNote = 'Passe den Text an deinen Fall an. Fristen und verlangte Unterlagen bleiben deine Verantwortung.';
+    const completeTemplate = index => `${templates[index].text}\n\n${templateNote}`;
 
     const views = [...document.querySelectorAll('.view')];
     const cards = [...document.querySelectorAll('[data-card]')];
@@ -166,12 +169,12 @@
       const copy = panel.querySelector('.copy');
       panel.hidden = false;
       if (type === 'checker') {
-        title.textContent = 'DOKUMENTENCHECKER / FORMULAR-LOTSE';
+        title.textContent = 'FORMULAR-LOTSE · IN VORBEREITUNG';
         body.textContent = 'In Vorbereitung. Verwende später nur den offiziellen Dokumentnamen, eine allgemeine Formularnummer oder einen Behördenlink. Keine ausgefüllten Formulare, persönlichen Aktenzeichen, Kundennummern oder Gesundheitsdaten hochladen.';
         copy.hidden = true;
       } else {
         title.textContent = `MUSTERTEXT · ${templates[index].name.toUpperCase()}`;
-        body.textContent = templates[index].text;
+        body.textContent = completeTemplate(index);
         copy.hidden = false;
       }
       panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -180,7 +183,7 @@
     cards.forEach((card, index) => {
       const actions = document.createElement('div');
       actions.className = 'actions';
-      actions.innerHTML = '<button type="button" class="action primary template-button">MUSTERTEXT ANZEIGEN</button><button type="button" class="action checker-button">DOKUMENTENCHECKER</button>';
+      actions.innerHTML = '<button type="button" class="action primary template-button">MUSTERTEXT ANZEIGEN</button><button type="button" class="action checker-button">FORMULAR-LOTSE · IN VORBEREITUNG</button>';
       const panel = document.createElement('div');
       panel.className = 'letter';
       panel.hidden = true;
@@ -191,7 +194,7 @@
       panel.querySelector('.close-letter').addEventListener('click', () => { panel.hidden = true; });
       panel.querySelector('.copy').addEventListener('click', async event => {
         try {
-          await navigator.clipboard.writeText(templates[index].text);
+          await navigator.clipboard.writeText(completeTemplate(index));
           event.currentTarget.textContent = 'KOPIERT';
           setTimeout(() => { event.currentTarget.textContent = 'TEXT KOPIEREN'; }, 1400);
         } catch (error) {
